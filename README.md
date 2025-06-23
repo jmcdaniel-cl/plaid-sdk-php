@@ -29,7 +29,7 @@ For full description of request and response payloads and properties, please see
 
 ## Requirements
 
-* PHP 7.3+ | PHP 8.0+
+* PHP 8.2+
 * ext-curl
 * ext-json
 
@@ -332,7 +332,7 @@ Methods:
 * `refreshAssetReport(string $asset_report_token, int $days_requested, array $options = []): object`
 * `filterAssetReport(string $asset_report_token, array $exclude_accounts): object`
 * `getAssetReport(string $asset_report_token, bool $include_insights = false): object`
-* `getAssetReportPdf(string $asset_report_token): ResponseInterface` **Note:** Because this endpoint returns PDF content in the repsponse body, this method returns an instance of a PSR-7 `ResponseInterface`. You may leverage the `Response` object to stream the PDF back to the requesting client and access response headers
+* `getAssetReportPdf(string $asset_report_token): ResponseInterface` **Note:** Because this endpoint returns PDF content in the response body, this method returns an instance of a PSR HTTP Message 2.0 `ResponseInterface`. You may leverage the `Response` object to stream the PDF back to the requesting client and access response headers
 * `removeAssetReport(string $asset_report_token): object`
 * `createAssetReportAuditCopy(string $asset_report_token, string $auditor_id): object`
 * `removeAssetReportAuditCopy(string $audit_copy_token): object`
@@ -426,11 +426,11 @@ $address = new TomorrowIdeas\Plaid\Entities\RecipientAddress("123 Elm St.", "Apt
 
 Example:
 
-The `TomorrowIdeas\Plaid\Entities\PaymnentSchedule` entity is used when creating a new payment that will be a recurring charge.
+The `TomorrowIdeas\Plaid\Entities\PaymentSchedule` entity is used when creating a new payment that will be a recurring charge.
 See `createPayment` method for more information.
 
 ```php
-$payment_schedule = new TomorrowIdeas\Plaid\Entities\PaymnentSchedule(
+$payment_schedule = new TomorrowIdeas\Plaid\Entities\PaymentSchedule(
     PaymentSchedule::INTERVAL_MONTHLY,
     15,
     new DateTime("2020-10-01")
@@ -439,4 +439,4 @@ $payment_schedule = new TomorrowIdeas\Plaid\Entities\PaymnentSchedule(
 
 ## Errors
 
-All unsuccessfull (non 2xx) responses will throw a `PlaidRequestException`. The full response object is available via the `getResponse()` method.
+All unsuccessful (non 2xx) responses will throw a `PlaidRequestException`. The full response object is available via the `getResponse()` method.
