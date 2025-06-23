@@ -2,11 +2,11 @@
 
 namespace TomorrowIdeas\Plaid\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
-use Capsule\ResponseStatus;
-use Shuttle\Handler\MockHandler;
-use Shuttle\Shuttle;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
+use Nimbly\Capsule\ResponseStatus;
+use Nimbly\Shuttle\Handler\MockHandler;
+use Nimbly\Shuttle\Shuttle;
 use TomorrowIdeas\Plaid\Plaid;
 use TomorrowIdeas\Plaid\PlaidRequestException;
 use UnexpectedValueException;
@@ -26,7 +26,7 @@ class AbstractResourceTest extends TestCase
 
 		$reflectionClass = new \ReflectionClass($itemsResource);
 
-        $method = $reflectionClass->getMethod("buildRequest");
+		$method = $reflectionClass->getMethod("buildRequest");
 		$method->setAccessible(true);
 
 		$request = $method->invokeArgs($itemsResource, ["post", "/endpoint"]);
@@ -39,67 +39,70 @@ class AbstractResourceTest extends TestCase
 
 	public function test_request_exception_passes_through_plaid_display_message(): void
 	{
-		$httpClient = new Shuttle([
-			'handler' => new MockHandler([
-				function(Request $request) {
+		$httpClient = new Shuttle(
+			new MockHandler([
+				function (Request $request)
+				{
 
 					$requestParams = [
 						"display_message" => "DISPLAY MESSAGE",
 					];
 
-					return new Response(300, \json_encode($requestParams));
-
+					return new Response(ResponseStatus::MULTIPLE_CHOICES, \json_encode($requestParams));
 				}
 			])
-		]);
+		);
 
 		$plaid = new Plaid("client_id", "secret");
 		$plaid->setHttpClient($httpClient);
 
-		try {
+		try
+		{
 			$plaid->items->get("access_token");
 		}
-		catch( PlaidRequestException $plaidRequestException ){
+		catch (PlaidRequestException $plaidRequestException)
+		{
 
 			$this->assertEquals("DISPLAY MESSAGE", $plaidRequestException->getMessage());
-
 		}
 	}
 
 	public function test_request_exception_passes_through_http_status_code(): void
 	{
-		$httpClient = new Shuttle([
-			'handler' => new MockHandler([
-				function(Request $request) {
+		$httpClient = new Shuttle(
+			new MockHandler([
+				function (Request $request)
+				{
 
 					$requestParams = [
 						"display_message" => "DISPLAY MESSAGE",
 					];
 
-					return new Response(300, \json_encode($requestParams));
-
+					return new Response(ResponseStatus::MULTIPLE_CHOICES, \json_encode($requestParams));
 				}
 			])
-		]);
+		);
 
 		$plaid = new Plaid("client_id", "secret");
 		$plaid->setHttpClient($httpClient);
 
-		try {
+		try
+		{
 			$plaid->items->get("access_token");
 		}
-		catch( PlaidRequestException $plaidRequestException ){
+		catch (PlaidRequestException $plaidRequestException)
+		{
 
 			$this->assertEquals(300, $plaidRequestException->getCode());
-
 		}
 	}
 
 	public function test_1xx_responses_throw_exception(): void
 	{
-		$httpClient = new Shuttle([
-			'handler' => new MockHandler([
-				function(Request $request) {
+		$httpClient = new Shuttle(
+			new MockHandler([
+				function (Request $request)
+				{
 
 					$requestParams = [
 						"method" => $request->getMethod(),
@@ -111,11 +114,10 @@ class AbstractResourceTest extends TestCase
 						"params" => \json_decode($request->getBody()->getContents()),
 					];
 
-					return new Response(100, \json_encode($requestParams));
-
+					return new Response(ResponseStatus::CONTINUE, \json_encode($requestParams));
 				}
 			])
-		]);
+		);
 
 		$plaid = new Plaid("client_id", "secret");
 		$plaid->setHttpClient($httpClient);
@@ -126,19 +128,19 @@ class AbstractResourceTest extends TestCase
 
 	public function test_3xx_responses_and_above_throw_exception(): void
 	{
-		$httpClient = new Shuttle([
-			'handler' => new MockHandler([
-				function(Request $request) {
+		$httpClient = new Shuttle(
+			new MockHandler([
+				function (Request $request)
+				{
 
 					$requestParams = [
 						"display_message" => "PLAID_ERROR",
 					];
 
-					return new Response(300, \json_encode($requestParams));
-
+					return new Response(ResponseStatus::MULTIPLE_CHOICES, \json_encode($requestParams));
 				}
 			])
-		]);
+		);
 
 		$plaid = new Plaid("client_id", "secret");
 		$plaid->setHttpClient($httpClient);
@@ -149,11 +151,11 @@ class AbstractResourceTest extends TestCase
 
 	public function test_invalid_json_when_parsing_response(): void
 	{
-		$httpClient = new Shuttle([
-			'handler' => new MockHandler([
+		$httpClient = new Shuttle(
+			new MockHandler([
 				new Response(ResponseStatus::OK, "invalid_json")
 			])
-		]);
+		);
 
 		$plaid = new Plaid("client_id", "secret");
 		$plaid->setHttpClient($httpClient);

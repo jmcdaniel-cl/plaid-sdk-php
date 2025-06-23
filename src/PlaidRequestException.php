@@ -24,12 +24,14 @@ class PlaidRequestException extends PlaidException
 
 		$this->code = $responseInterface->getStatusCode();
 
-		if( \is_object($response) ){
+		if (\is_object($response))
+		{
 			$this->response = $response;
 			$this->message = (string) ($this->response->display_message ?? $responseInterface->getReasonPhrase());
 		}
 
-		else {
+		else
+		{
 			$this->message = $responseInterface->getReasonPhrase();
 		}
 	}

@@ -40,9 +40,11 @@ class PaymentSchedule
 	public function __construct(
 		string $interval,
 		int $interval_execution_day,
-		DateTime $start_date)
+		DateTime $start_date
+	)
 	{
-		if( !\in_array($interval, [self::INTERVAL_MONTHLY, self::INTERVAL_WEEKLY]) ){
+		if (!\in_array($interval, [self::INTERVAL_MONTHLY, self::INTERVAL_WEEKLY]))
+		{
 			throw new InvalidArgumentException("Interval must be WEEKLY or MONTHLY.");
 		}
 

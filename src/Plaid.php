@@ -4,7 +4,7 @@ namespace TomorrowIdeas\Plaid;
 
 use Psr\Http\Client\ClientInterface;
 use ReflectionClass;
-use Shuttle\Shuttle;
+use Nimbly\Shuttle\Shuttle;
 use TomorrowIdeas\Plaid\Resources\AbstractResource;
 use UnexpectedValueException;
 
@@ -84,9 +84,11 @@ class Plaid
 	public function __construct(
 		string $client_id,
 		string $client_secret,
-		string $environment = "production")
+		string $environment = "production"
+	)
 	{
-		if( !\array_key_exists($environment, $this->plaidEnvironments) ){
+		if (!\array_key_exists($environment, $this->plaidEnvironments))
+		{
 			throw new UnexpectedValueException("Invalid environment. Environment must be one of: production, development, or sandbox.");
 		}
 
@@ -104,13 +106,15 @@ class Plaid
 	 */
 	public function __get(string $resource): AbstractResource
 	{
-		if( !isset($this->resource_cache[$resource]) ){
+		if (!isset($this->resource_cache[$resource]))
+		{
 
 			$resource = \str_replace([" "], "", \ucwords(\str_replace(["_"], " ", $resource)));
 
 			$resource_class = "\\TomorrowIdeas\\Plaid\\Resources\\" . $resource;
 
-			if( !\class_exists($resource_class) ){
+			if (!\class_exists($resource_class))
+			{
 				throw new UnexpectedValueException("Unknown Plaid resource: {$resource}");
 			}
 
@@ -150,7 +154,8 @@ class Plaid
 	 */
 	public function getHttpClient(): ClientInterface
 	{
-		if( empty($this->httpClient) ){
+		if (empty($this->httpClient))
+		{
 			$this->httpClient = new Shuttle;
 		}
 

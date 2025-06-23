@@ -2,20 +2,22 @@
 
 namespace TomorrowIdeas\Plaid\Tests;
 
-use Capsule\Request;
-use Capsule\Response;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\Response;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
-use Shuttle\Handler\MockHandler;
-use Shuttle\Shuttle;
+use Nimbly\Shuttle\Handler\MockHandler;
+use Nimbly\Shuttle\Shuttle;
 use TomorrowIdeas\Plaid\Plaid;
+use Nimbly\Capsule\ResponseStatus;
 
 abstract class TestCase extends PHPUnitTestCase
 {
 	protected function getPlaidClient(string $environment = "production"): Plaid
 	{
-		$httpClient = new Shuttle([
-			'handler' => new MockHandler([
-				function(Request $request) {
+		$httpClient = new Shuttle(
+			new MockHandler([
+				function (Request $request)
+				{
 
 					$requestParams = [
 						"method" => $request->getMethod(),
@@ -27,11 +29,10 @@ abstract class TestCase extends PHPUnitTestCase
 						"params" => \json_decode($request->getBody()->getContents()),
 					];
 
-					return new Response(200, \json_encode($requestParams));
-
+					return new Response(ResponseStatus::OK, \json_encode($requestParams));
 				}
 			])
-		]);
+		);
 
 		$plaid = new Plaid("client_id", "secret", $environment);
 		$plaid->setHttpClient($httpClient);

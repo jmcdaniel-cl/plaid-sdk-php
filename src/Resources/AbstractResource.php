@@ -2,7 +2,8 @@
 
 namespace TomorrowIdeas\Plaid\Resources;
 
-use Capsule\Request;
+use Nimbly\Capsule\Request;
+use Nimbly\Capsule\ResponseStatus;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -50,7 +51,8 @@ abstract class AbstractResource
 		ClientInterface $httpClient,
 		string $client_id,
 		string $client_secret,
-		string $hostname)
+		string $hostname
+	)
 	{
 		$this->httpClient = $httpClient;
 		$this->client_id = $client_id;
@@ -88,7 +90,8 @@ abstract class AbstractResource
 
 		$payload = \json_decode($response->getBody()->getContents());
 
-		if( \json_last_error() !== JSON_ERROR_NONE ){
+		if (\json_last_error() !== JSON_ERROR_NONE)
+		{
 			throw new UnexpectedValueException("Invalid JSON response returned by Plaid");
 		}
 
@@ -110,7 +113,11 @@ abstract class AbstractResource
 			$this->buildRequest($method, $path, $params)
 		);
 
-		if( $response->getStatusCode() < 200 || $response->getStatusCode() >= 300 ){
+		if (
+			$response->getStatusCode() < ResponseStatus::OK->value
+			|| $response->getStatusCode() >= ResponseStatus::MULTIPLE_CHOICES->value
+		)
+		{
 			throw new PlaidRequestException($response);
 		}
 
